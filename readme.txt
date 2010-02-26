@@ -2,9 +2,9 @@
 Contributors: aknox, fullthrottledevelopment
 Donate link: http://fullthrottledevelopment.com
 Tags: facebook, status, wall, authors, users, update, social networks, social media, marketing, social network marketing
-Requires at least: 2.9
-Tested up to: 2.9.1
-Stable tag: 2.0.0
+Requires at least: 2.8
+Tested up to: 2.9.2
+Stable tag: 2.0.1
 
 Publish your post information by author to your Facebook profile status or to a Facebook Page.
 
@@ -12,8 +12,6 @@ Publish your post information by author to your Facebook profile status or to a 
 
 This plugin publishes the title, url, and/or excerpt of your post as the status of your Facebook profile and/or Facebook Page.
   
-**The plugin requires Php5.**     
-    
 == Installation ==
 
 1.   Unzip and upload 'FT-Facepress-II' directory to your '/wp-content/plugins/' directory   
@@ -23,12 +21,18 @@ This plugin publishes the title, url, and/or excerpt of your post as the status 
 == Changelog ==  
 
 = 2.0.0 =    
-* First public release.    
+* First public release.  
+
+= 2.0.1 =
+* Add ability to test connection to facebook.  
 
 == Upgrade Notice ==
 
 = 2.0.0 =
 * First public release.
+
+= 2.0.1 =
+* Add ability to test connection to facebook.  
    
 == Frequently Asked Questions ==
 
