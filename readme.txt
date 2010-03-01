@@ -4,7 +4,7 @@ Donate link: http://fullthrottledevelopment.com
 Tags: facebook, status, wall, authors, users, update, social networks, social media, marketing, social network marketing
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 
 Publish your post information by author to your Facebook profile status or to a Facebook Page.
 
@@ -26,6 +26,9 @@ This plugin publishes the title, url, and/or excerpt of your post as the status 
 = 2.0.1 =
 * Add ability to test connection to facebook.  
 
+= 2.0.2 =
+* Changed from mail() to wp_mail() function for better WordPress functionality.
+
 == Upgrade Notice ==
 
 = 2.0.0 =
@@ -34,6 +37,9 @@ This plugin publishes the title, url, and/or excerpt of your post as the status 
 = 2.0.1 =
 * Add ability to test connection to facebook.  
    
+= 2.0.2 =
+* Changed from mail() to wp_mail() function for better WordPress functionality.
+
 == Frequently Asked Questions ==
 
 = Where can I find help or make suggestions? =
