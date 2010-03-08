@@ -4,7 +4,7 @@ Plugin Name: FT FacePress II
 Plugin URI: http://fullthrottledevelopment.com/facepress-ii
 Description: This plugin publishes the title, url, and/or excerpt of your post as the status of your Facebook profile and/or Facebook page by WordPress author.
 Author: Alan Knox @ FullThrottle Development
-Version: 2.0.3
+Version: 2.0.4
 Author URI: http://fullthrottledevelopment.com/
 */
 
@@ -15,7 +15,7 @@ Copyright 2010  FullThrottle Development
 
 $php_version = (int)phpversion();
 
-define( 'FacepressII_Version' , '2.0.2' );
+define( 'FacepressII_Version' , '2.0.4' );
 		
 // Define class
 if (!class_exists("FT_FacepressII")) {
@@ -151,11 +151,23 @@ if (!class_exists("FT_FacepressII")) {
                     <?php } else { ?> 
                     	<p style="font-size: 11px; margin-bottom: 0px; color: green;"><strong>NOTE:</strong> When WordPress user <?php echo $user_login; ?> publishes a WordPress post, FacePress will update the user's facebook accounts as listed below, as well as the admin facebook accounts as set in the FacePress II Admin Options.</p>
                     <?php } ?> 
-					<p><div style="width=100px;"><strong>Facebook PROFILE personalized upload email address:</strong> </div><input name="ft_facepressiiprofile" id="ft_facepressiiprofile" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiProfile]), 'FT_FacePressII') ?>" /> [<a href="<?php echo get_bloginfo('url'); ?>/wp-content/plugins/facepress-ii/fbtest.php?testEmail=<?php echo $options[$this->facepressiiProfile]; ?>&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20<?php echo get_bloginfo('url'); ?>" target="_blank">test facebook connection</a>] (Update settings before test.)</p>
+					<p><div style="width=100px;"><strong>Facebook PROFILE personalized upload email address:</strong> </div><input name="ft_facepressiiprofile" id="ft_facepressiiprofile" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiProfile]), 'FT_FacePressII') ?>" />
+					<?php if ($options[$this->facepressiiProfile]) { 
+						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
+						echo $options[$this->facepressiiProfile]; 
+						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url');
+						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
+					} ?></p>
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">To find the "personalized upload email address" that Facebook associates with your PROFILE, click Account / Account Settings / Mobile / Go to Facebook Mobile. Look for the section labelled "Upload via Email". Your profile's personalized upload email address will be listed in this section.</p>
                     </div>
-					<p><div style="width=100px;"><strong>Facebook PAGE personalized upload email address:</strong> </div><input name="ft_facepressiipage" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiPage]), 'FT_FacePressII') ?>" /> [<a href="<?php echo get_bloginfo('url'); ?>/wp-content/plugins/facepress-ii/fbtest.php?testEmail=<?php echo $options[$this->facepressiiPage]; ?>&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20<?php echo get_bloginfo('url'); ?>" target="_blank">test facebook connection</a>] (Update settings before test.)</p>
+					<p><div style="width=100px;"><strong>Facebook PAGE personalized upload email address:</strong> </div><input name="ft_facepressiipage" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiPage]), 'FT_FacePressII') ?>" /> 
+                    <?php if ($options[$this->facepressiiPage]) { 
+						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
+						echo $options[$this->facepressiiPage]; 
+						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url');
+						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
+					} ?></p>
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">To find the "personalized upload email address" that Facebook associates with your PAGE, click "Edit Page" under your page's image. Then click "Edit" in the "Mobile" section. Facebook will then display the personalized upload email address for your page in the "Mobile" section.</p>
                     </div>
@@ -250,8 +262,8 @@ if (!class_exists("FT_FacepressII")) {
                 <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-right:10px;"><?php _e('Exclude this Post:', 'face_press') ?></th>
                 <td><input value="1" type="checkbox" name="ftfp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> /></td></tr>
                 
-                <tr><th scope="row" style="text-align:right; width:150px; padding-right:10px;"><?php _e('Format:', 'face_press') ?></th>
-                <td><input value="<?php echo $format ?>" type="text" name="ftfp_format" size="90px"/></td></tr>
+                <tr><th scope="row" style="text-align:right; width:80px; padding-right:10px;"><?php _e('Format:', 'face_press') ?></th>
+                <td><input value="<?php echo $format ?>" type="text" name="ftfp_format" size="50px"/></td></tr>
 
                 <tr><th scope="row" style="text-align:right; width:150px; vertical-align:top; padding-top: 5px; padding-right:10px;">Format Options:</th>
                 <td style="vertical-align:top;">
