@@ -4,7 +4,7 @@ Plugin Name: FT FacePress II
 Plugin URI: http://fullthrottledevelopment.com/facepress-ii
 Description: This plugin publishes the title, url, and/or excerpt of your post as the status of your Facebook profile and/or Facebook page by WordPress author.
 Author: Alan Knox @ FullThrottle Development
-Version: 2.0.4
+Version: 2.0.5
 Author URI: http://fullthrottledevelopment.com/
 */
 
@@ -15,7 +15,7 @@ Copyright 2010  FullThrottle Development
 
 $php_version = (int)phpversion();
 
-define( 'FacepressII_Version' , '2.0.4' );
+define( 'FacepressII_Version' , '2.0.5' );
 		
 // Define class
 if (!class_exists("FT_FacepressII")) {
@@ -33,6 +33,7 @@ if (!class_exists("FT_FacepressII")) {
 		var $facepressiiShortURLs		= "ft_facepressiishorturls";
 		var $facepressiiCats			= "ft_facepressiicats";
 		var $facepressiiAllUsers     	= "ft_facepressiiallusers";
+		var $facepressiiNoPublish     	= "ft_facepressiinopublish";
 
 		// Constructor
 		function FT_FacePressII() {
@@ -69,7 +70,8 @@ if (!class_exists("FT_FacepressII")) {
 								 $this->facepressiiFormat 		=> $facepressiiFormat,
 								 $this->facepressiiShortURLs 	=> $facepressiiShortURLs,
 								 $this->facepressiiCats			=> $facepressiiCats,
-								 $this->facepressiiAllUsers		=> $facepressiiAllUsers
+								 $this->facepressiiAllUsers		=> $facepressiiAllUsers,
+								 $this->facepressiiNoPublish	=> $facepressiiNoPublish
 							);
 								 
 			if (empty($user_login)) { 
@@ -130,6 +132,7 @@ if (!class_exists("FT_FacepressII")) {
 
 				if ($emptyUser) { //then we're dealing with the main Admin options
 					$options[$this->facepressiiAllUsers] = $_POST['ft_facepressiiallusers'];
+					$options[$this->facepressiiNoPublish] = $_POST['ft_facepressiinopublish'];
 					$optionsAppend = "";
 				} else {
 					$optionsAppend = "_" . $user_login;
@@ -144,8 +147,15 @@ if (!class_exists("FT_FacepressII")) {
 			// Display HTML form for the options below
 			?>
 			<div class=wrap>
-				<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
 					<h2>FacePress II Options for WordPress user <?php if ($emptyUser) { echo 'admin'; } else { echo $user_login; } ?></h2>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="9RA8B2ZLS646E">
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+				<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
                     <?php if ($emptyUser) { ?>
                     	<p style="font-size: 11px; margin-bottom: 0px; color: green;"><strong>NOTE:</strong> When any user publishes a WordPress post, FacePress will update the admin facebook accounts as listed below, as well as the individual user facebook accounts as set in the FacePress II User Options.</p>
                     <?php } else { ?> 
@@ -155,7 +165,7 @@ if (!class_exists("FT_FacepressII")) {
 					<?php if ($options[$this->facepressiiProfile]) { 
 						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
 						echo $options[$this->facepressiiProfile]; 
-						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url');
+						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url') . '"';
 						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
 					} ?></p>
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
@@ -165,7 +175,7 @@ if (!class_exists("FT_FacepressII")) {
                     <?php if ($options[$this->facepressiiPage]) { 
 						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
 						echo $options[$this->facepressiiPage]; 
-						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url');
+						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url') . '"';
 						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
 					} ?></p>
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
@@ -193,8 +203,11 @@ if (!class_exists("FT_FacepressII")) {
                     <div class="facepressii-allusers" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">Check this box if you want FacePress II to update each available author profile when any user publishes a post.</p>
                     </div>
+                    <p><strong>Default to NOT publish to facebook:</strong> <input value="1" type="checkbox" name="ft_facepressiinopublish" <?php if ((int)$options[$this->facepressiiNoPublish] == 1) echo "checked"; ?> /></p>
+                    <div class="facepressii-nopublish" style="margin-left: 50px;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">Check this box if you want FacePress II default to NOT publishing post info to facebook. A checkbox will be available in the options section of each post to override either setting.</p>
+                    </div>
                     <?php } ?>
-
                     <p style="font-size: 11px; margin-top: 50px;">*NOTE: <a href="http://wordpress.org/extend/plugins/twitter-friendly-links/">Twitter Friendly Links Plugin</a> must be activated in Wordpress to publish shortened URLs. Otherwise, the full URL will be used for the %URL% format regardless of this setting.</p>
                     
 					<div class="submit">
@@ -211,9 +224,11 @@ if (!class_exists("FT_FacepressII")) {
 			if (isset($awmp_edit) && !empty($awmp_edit)) {
 				$format = $_POST["ftfp_format"];
 				$exclude = $_POST["ftfp_exclude"];
+				$include = $_POST["ftfp_include"];
 	
 				delete_post_meta($id, 'ftfp_format');
 				delete_post_meta($id, 'ftfp_exclude');
+				delete_post_meta($id, 'ftfp_include');
 				
 				if (isset($format) && !empty($format)) {
 					add_post_meta($id, 'ftfp_format', $format);
@@ -221,6 +236,10 @@ if (!class_exists("FT_FacepressII")) {
 				
 				if (isset($exclude) && !empty($exclude)) {
 					add_post_meta($id, 'ftfp_exclude', $exclude);
+				}
+
+				if (isset($include) && !empty($include)) {
+					add_post_meta($id, 'ftfp_include', $include);
 				}
 			}
 		}
@@ -232,9 +251,13 @@ if (!class_exists("FT_FacepressII")) {
 			if (is_object($post_id)) {
 				$post_id = $post_id->ID;
 			}
+
+			$options = get_option('ft_facepressii');
+			$defaultNoPublish = $options['ft_facepressiinopublish'];
 			
             $format = get_post_meta($post_id, 'ftfp_format', true);
-            $exclude = get_post_meta($post_id, 'ftfp_exclude', true); ?>
+            $exclude = get_post_meta($post_id, 'ftfp_exclude', true); 
+            $include = get_post_meta($post_id, 'ftfp_include', true); ?>
 	
 			<?php if (substr($this->wp_version, 0, 3) >= '2.5') { ?>
                     <div id="postftfp" class="postbox">
@@ -259,8 +282,21 @@ if (!class_exists("FT_FacepressII")) {
                 </th>
                 </tr>
 
-                <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-right:10px;"><?php _e('Exclude this Post:', 'face_press') ?></th>
-                <td><input value="1" type="checkbox" name="ftfp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> /></td></tr>
+                <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-right:10px;">
+				<?php if ((int)$defaultNoPublish == 1) { 
+					_e('Publish this Post to Facebook:', 'face_press'); ?>
+                    </th>
+                    <td><input value="1" type="checkbox" name="ftfp_include" 
+					<?php if ((int)$include == 1) echo "checked"; ?> />
+				<?php }                    
+				else { 
+					_e('Do NOT publish this Post to Facebook:', 'face_press'); ?>
+                    </th>
+                    <td><input value="1" type="checkbox" name="ftfp_exclude" 
+					<?php if ((int)$exclude == 1) echo "checked"; ?> />
+				<?php } ?>                
+
+                </td></tr>
                 
                 <tr><th scope="row" style="text-align:right; width:80px; padding-right:10px;"><?php _e('Format:', 'face_press') ?></th>
                 <td><input value="<?php echo $format ?>" type="text" name="ftfp_format" size="50px"/></td></tr>
@@ -308,6 +344,7 @@ if (!function_exists("FT_FacePressII_ap")) {
 		if (function_exists('add_option')) {
 			add_option('ftfp_format', '', 'FacePress II Meta Tags Format', 'yes');
 			add_option('ftfp_exclude', '', 'FacePress II Meta Tags Exclude', 'yes');
+			add_option('ftfp_include', '', 'FacePress II Meta Tags Include', 'yes');
 		}
 	}	
 }
@@ -327,6 +364,12 @@ if (!function_exists("ft_publish_to_facebook")) {
 
 		if ($post->post_type == 'post') {
 			$options = get_option('ft_facepressii');
+			$defaultNoPublish = $options['ft_facepressiinopublish'];
+
+			$exclude = get_post_meta($postID, 'ftfp_exclude', true);
+			$include = get_post_meta($postID, 'ftfp_include', true);
+			if ((int)$defaultNoPublish == 1 and (int)$include != 1) return;
+			if ((int)$defaultNoPublish != 1 and (int)$exclude == 1) return;
 			
 			if ($options['ft_facepressiiallusers']) {
 				$user_ids = $wpdb->get_col($wpdb->prepare( "SELECT user_login 
@@ -348,9 +391,6 @@ if (!function_exists("ft_publish_to_facebook")) {
 				
 				if(!empty($options)) {
 					
-					$exclude = get_post_meta($postID, 'ftfp_exclude', true);
-					if ($exclude == 1) return;
-
 					$continue = FALSE;
 					if (!empty($options['ft_facepressiicats'])) {
 						$cats = split(",", $options['ft_facepressiicats']);
