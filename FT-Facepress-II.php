@@ -4,7 +4,7 @@ Plugin Name: FT FacePress II
 Plugin URI: http://fullthrottledevelopment.com/facepress-ii
 Description: This plugin publishes the title, url, and/or excerpt of your post as the status of your Facebook profile and/or Facebook page by WordPress author.
 Author: Alan Knox @ FullThrottle Development
-Version: 2.0.5
+Version: 2.0.6
 Author URI: http://fullthrottledevelopment.com/
 */
 
@@ -15,7 +15,7 @@ Copyright 2010  FullThrottle Development
 
 $php_version = (int)phpversion();
 
-define( 'FacepressII_Version' , '2.0.5' );
+define( 'FacepressII_Version' , '2.0.6' );
 		
 // Define class
 if (!class_exists("FT_FacepressII")) {
@@ -156,28 +156,20 @@ if (!class_exists("FT_FacepressII")) {
 </form>
 
 				<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
+					<?php wp_nonce_field( 'test_facebook' ); ?></p>
                     <?php if ($emptyUser) { ?>
                     	<p style="font-size: 11px; margin-bottom: 0px; color: green;"><strong>NOTE:</strong> When any user publishes a WordPress post, FacePress will update the admin facebook accounts as listed below, as well as the individual user facebook accounts as set in the FacePress II User Options.</p>
                     <?php } else { ?> 
                     	<p style="font-size: 11px; margin-bottom: 0px; color: green;"><strong>NOTE:</strong> When WordPress user <?php echo $user_login; ?> publishes a WordPress post, FacePress will update the user's facebook accounts as listed below, as well as the admin facebook accounts as set in the FacePress II Admin Options.</p>
                     <?php } ?> 
 					<p><div style="width=100px;"><strong>Facebook PROFILE personalized upload email address:</strong> </div><input name="ft_facepressiiprofile" id="ft_facepressiiprofile" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiProfile]), 'FT_FacePressII') ?>" />
-					<?php if ($options[$this->facepressiiProfile]) { 
-						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
-						echo $options[$this->facepressiiProfile]; 
-						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url') . '"';
-						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
-					} ?></p>
+						<input type="button" class="button" name="test_ft_facepress_profile" id="test_profile" value="<?php _e('Test Facebook Connection', 'FT_FacePressII') ?>" />
+					</p>
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">To find the "personalized upload email address" that Facebook associates with your PROFILE, click Account / Account Settings / Mobile / Go to Facebook Mobile. Look for the section labelled "Upload via Email". Your profile's personalized upload email address will be listed in this section.</p>
                     </div>
-					<p><div style="width=100px;"><strong>Facebook PAGE personalized upload email address:</strong> </div><input name="ft_facepressiipage" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiPage]), 'FT_FacePressII') ?>" /> 
-                    <?php if ($options[$this->facepressiiPage]) { 
-						echo '[<a href="' . get_bloginfo('url') . '/wp-content/plugins/facepress-ii/fbtest.php?testEmail=';
-						echo $options[$this->facepressiiPage]; 
-						echo '&subjEmail=Testing%20FacePress%20II%20WordPress%20Plugin%20at%20' . get_bloginfo('url') . '"';
-						echo ' target="_blank">test facebook connection</a>] (Update settings before test.)';
-					} ?></p>
+					<p><div style="width=100px;"><strong>Facebook PAGE personalized upload email address:</strong> </div><input name="ft_facepressiipage" id="ft_facepressiipage" style="width: 30%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->facepressiiPage]), 'FT_FacePressII') ?>" /> 
+						<input type="button" class="button" name="test_ft_facepress_page" id="test_page" value="<?php _e('Test Facebook Connection', 'FT_FacePressII') ?>" />
 					<div class="facepressii-profile-info" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">To find the "personalized upload email address" that Facebook associates with your PAGE, click "Edit Page" under your page's image. Then click "Edit" in the "Mobile" section. Facebook will then display the personalized upload email address for your page in the "Mobile" section.</p>
                     </div>
@@ -208,10 +200,10 @@ if (!class_exists("FT_FacepressII")) {
                     <p style="font-size: 11px; margin-bottom: 0px;">Check this box if you want FacePress II default to NOT publishing post info to facebook. A checkbox will be available in the options section of each post to override either setting.</p>
                     </div>
                     <?php } ?>
-                    <p style="font-size: 11px; margin-top: 50px;">*NOTE: <a href="http://wordpress.org/extend/plugins/twitter-friendly-links/">Twitter Friendly Links Plugin</a> must be activated in Wordpress to publish shortened URLs. Otherwise, the full URL will be used for the %URL% format regardless of this setting.</p>
+                    <p style="font-size: 11px; margin-top: 30px;">*NOTE: <a href="http://wordpress.org/extend/plugins/twitter-friendly-links/">Twitter Friendly Links Plugin</a> must be activated in Wordpress to publish shortened URLs. Otherwise, the full URL will be used for the %URL% format regardless of this setting.</p>
                     
 					<div class="submit">
-						<input type="submit" name="update_ft_facepressii_settings" value="<?php _e('Update Settings', 'FT_FacePressII') ?>" />
+						<input type="submit" class="button-primary" name="update_ft_facepressii_settings" value="<?php _e('Update Settings', 'FT_FacePressII') ?>" />
 					</div>
 				</form>
 			</div>
@@ -348,6 +340,155 @@ if (!function_exists("FT_FacePressII_ap")) {
 		}
 	}	
 }
+
+
+// Example followed from http://codex.wordpress.org/AJAX_in_Plugins
+if (!function_exists("test_profile_js")) {
+	function test_profile_js() {
+	?>
+	<script type="text/javascript" >
+	jQuery(document).ready(function($) {
+		$('#test_profile').click(function() {
+			var emailAddr = $('input#ft_facepressiiprofile').val();
+			if (emailAddr == "") {
+				$('input#ft_facepressiiprofile').focus();
+				return false;
+			}
+		
+			var data = {
+				action: 'test_facebook',
+				email: emailAddr,
+				_wpnonce: $('input#_wpnonce').val()
+			};
+			
+			var style = "position: absolute; " +
+						"display: none; " +
+						"z-index: 1000; " +
+						"top: 50%; " +
+						"left: 50%; " +
+						"background-color: #E8E8E8; " +
+						"border: 1px solid #555; " +
+						"padding: 15px; " +
+						"width: 350px; " +
+						"min-height: 80px; " +
+						"margin-left: -175px; " + 
+						"margin-top: -40px;" +
+						"text-align: center;" +
+						"vertical-align: middle;";
+			$('body').append("<div id='test_results' style='" + style + "'></div>");
+			$('#test_results').html("<p>Sending test status to Facebook</p>" +
+									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
+			$('#test_results').show();
+			
+			// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+			jQuery.post(ajaxurl, data, function(response) {
+				$('#test_results').html('<p>' + response + '</p>' +
+										'<input type="button" class="button" name="results_ok_button" id="results_ok_button" value="OK" />');
+				$('#results_ok_button').click(remove_results);
+			});
+			
+		});
+		
+		function remove_results() {
+			jQuery("#results_ok_button").unbind("click");
+			jQuery("#test_results").remove();
+			if (typeof document.body.style.maxHeight == "undefined") {//if IE 6
+				jQuery("body","html").css({height: "auto", width: "auto"});
+				jQuery("html").css("overflow","");
+			}
+			document.onkeydown = "";
+			document.onkeyup = "";
+			return false;
+		}
+	});
+	</script>
+	
+	<?php
+	}
+}
+
+if (!function_exists("test_page_js")) {
+	function test_page_js() {
+	?>
+	<script type="text/javascript" >
+	jQuery(document).ready(function($) {
+		$('#test_page').click(function() {
+			var emailAddr = $('input#ft_facepressiipage').val();
+			if (emailAddr == "") {
+				$('input#ft_facepressiipage').focus();
+				return false;
+			}
+		
+			var data = {
+				action: 'test_facebook',
+				email: emailAddr,
+				_wpnonce: $('input#_wpnonce').val()
+			};
+			
+			var style = "position: absolute; " +
+						"display: none; " +
+						"z-index: 1000; " +
+						"top: 50%; " +
+						"left: 50%; " +
+						"background-color: #E8E8E8; " +
+						"border: 1px solid #555; " +
+						"padding: 15px; " +
+						"width: 350px; " +
+						"min-height: 80px; " +
+						"margin-left: -175px; " + 
+						"margin-top: -40px;" +
+						"text-align: center;" +
+						"vertical-align: middle;";
+			$('body').append("<div id='test_results' style='" + style + "'></div>");
+			$('#test_results').html("<p>Sending test status to Facebook</p>" +
+									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
+			$('#test_results').show();
+			
+			// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+			jQuery.post(ajaxurl, data, function(response) {
+				$('#test_results').html('<p>' + response + '</p>' +
+										'<input type="button" class="button" name="results_ok_button" id="results_ok_button" value="OK" />');
+				$('#results_ok_button').click(remove_results);
+			});
+			
+		});
+		
+		function remove_results() {
+			jQuery("#results_ok_button").unbind("click");
+			jQuery("#test_results").remove();
+			if (typeof document.body.style.maxHeight == "undefined") {//if IE 6
+				jQuery("body","html").css({height: "auto", width: "auto"});
+				jQuery("html").css("overflow","");
+			}
+			document.onkeydown = "";
+			document.onkeyup = "";
+			return false;
+		}
+	});
+	</script>
+	
+	<?php
+	}
+}
+
+
+if (!function_exists("test_facebook_ajax")) {
+	function test_facebook_ajax() {
+		check_ajax_referer('test_facebook');
+		
+		$emailAddr = $_POST['email'];
+		$status = 'Testing FacePress II WordPress Plugin ( http://fullthrottledevelopment.com/facepress-ii ) at ' . get_bloginfo('url');
+		$result = ft_publish_status($emailAddr, $status);
+		
+		if ($result == 200) {
+			die("Successfully sent your status to Facebook.<br>Don't forget to save your settings.");
+		} else {
+			die($result);
+		}
+	}
+}
+
+
 									
 // Add function to pubslih to facebook
 if (!function_exists("ft_publish_to_facebook")) {
@@ -457,19 +598,15 @@ if (!function_exists("ft_publish_to_facebook")) {
 				if (!empty($options['ft_facepressiiprofile']) || !empty($options['ft_facepressiipage'])) {
 
 					$subject = $ftstatus;
-					$message = '-';
-					$headers = 'From: '. get_bloginfo('admin_email') . "\r\n" .
-					    'Reply-To: '. get_bloginfo('admin_email') . "\r\n" .
-					    'X-Mailer: PHP/' . phpversion();
 
 					if (!empty($options['ft_facepressiiprofile'])) {
 						$to = $options['ft_facepressiiprofile'];
-						wp_mail($to, $subject, $message, $headers);
+						ft_publish_status($to, $subject);
 					}
 
 					if (!empty($options['ft_facepressiipage'])) {
 						$to = $options['ft_facepressiipage'];
-						wp_mail($to, $subject, $message, $headers);
+						ft_publish_status($to, $subject);
 					}
 				
 				}
@@ -480,6 +617,25 @@ if (!function_exists("ft_publish_to_facebook")) {
 		$wpdb->flush();
 	}	
 }
+
+if (!function_exists("ft_publish_status")) {
+	function ft_publish_status($emailAddr, $status) { 
+
+		$message = '-';
+		$headers = 'From: '. get_bloginfo('admin_email') . "\r\n" .
+		    'Reply-To: '. get_bloginfo('admin_email') . "\r\n" .
+		    'X-Mailer: PHP/' . phpversion();
+		wp_mail($emailAddr, $status, $message, $headers);
+		
+		if (is_wp_error($result)) {
+			return $result->get_error_message();
+		} else if (isset($result["response"]["code"])) {
+			return $result["response"]["code"];
+		} else {
+			return false;	}
+	}
+}
+
 
 // From PHP_Compat-1.6.0a2 Compat/Function/str_ireplace.php for PHP4 Compatibility
 if(!function_exists('str_ireplace')){
@@ -547,5 +703,10 @@ if (isset($dl_pluginFTFacePressII)) {
 	add_action('future_to_publish', 'ft_publish_to_facebook');
 	add_action('new_to_publish', 'ft_publish_to_facebook');
 	add_action('draft_to_publish', 'ft_publish_to_facebook');
+	
+	add_action('admin_head', 'test_profile_js');
+	add_action('admin_head', 'test_page_js');
+	add_action('wp_ajax_test_facebook', 'test_facebook_ajax');
+
 }
 ?>
