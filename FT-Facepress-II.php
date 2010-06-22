@@ -1,21 +1,21 @@
 <?php
 /*
 Plugin Name: FT FacePress II
-Plugin URI: http://fullthrottledevelopment.com/facepress-ii
+Plugin URI: http://knoxwebdev.com/facepress-ii
 Description: This plugin publishes the title, url, and/or excerpt of your post as the status of your Facebook profile and/or Facebook page by WordPress author.
-Author: Alan Knox @ FullThrottle Development
-Version: 2.0.6
-Author URI: http://fullthrottledevelopment.com/
+Author: Alan Knox 
+Version: 2.1.0
+Author URI: http://knoxwebdev.com/
 */
 
 /*
-Copyright 2010  FullThrottle Development
+Copyright 2010  Alan Knox Web Development
 
 */
 
 $php_version = (int)phpversion();
 
-define( 'FacepressII_Version' , '2.0.6' );
+define( 'FacepressII_Version' , '2.1.0' );
 		
 // Define class
 if (!class_exists("FT_FacepressII")) {
@@ -150,7 +150,7 @@ if (!class_exists("FT_FacepressII")) {
 					<h2>FacePress II Options for WordPress user <?php if ($emptyUser) { echo 'admin'; } else { echo $user_login; } ?></h2>
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="9RA8B2ZLS646E">
+<input type="hidden" name="hosted_button_id" value="542ZNCZYVZDYW">
 <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
@@ -266,7 +266,7 @@ if (!class_exists("FT_FacepressII")) {
                     <div class="dbx-content">
 			<?php } ?>
 		
-			<a target="__blank" href="http://fullthrottledevelopment.com/facepressii"><?php _e('FT FacePress', 'face_press') ?></a>
+			<a target="__blank" href="http://knoxwebdev.com/facepress-ii"><?php _e('FT FacePress', 'face_press') ?></a>
 			<input value="ftfp_edit" type="hidden" name="ftfp_edit" />
 			<table style="margin-bottom:40px">
                 <tr>
@@ -288,7 +288,15 @@ if (!class_exists("FT_FacepressII")) {
 					<?php if ((int)$exclude == 1) echo "checked"; ?> />
 				<?php } ?>                
 
-                </td></tr>
+                </td>
+				<td>
+                    <?php // Only show ReTweet button if the post is "published"
+					if ($post->post_status == "publish") { ?>
+                    <input style="float: right;" type="button" class="button" name="refacepress_facepress" id="refacepress_button" value="<?php _e('Re-FacePress', 'face-press') ?>" />
+					<?php wp_nonce_field( 'refacepress', 'refacepress_wpnonce' ); ?>
+                    <?php } ?>
+
+				</td></tr>
                 
                 <tr><th scope="row" style="text-align:right; width:80px; padding-right:10px;"><?php _e('Format:', 'face_press') ?></th>
                 <td><input value="<?php echo $format ?>" type="text" name="ftfp_format" size="50px"/></td></tr>
@@ -343,12 +351,12 @@ if (!function_exists("FT_FacePressII_ap")) {
 
 
 // Example followed from http://codex.wordpress.org/AJAX_in_Plugins
-if (!function_exists("test_profile_js")) {
-	function test_profile_js() {
+if (!function_exists("facepress_js")) {
+	function facepress_js() {
 	?>
 	<script type="text/javascript" >
 	jQuery(document).ready(function($) {
-		$('#test_profile').click(function() {
+		$('input#test_profile').click(function() {
 			var emailAddr = $('input#ft_facepressiiprofile').val();
 			if (emailAddr == "") {
 				$('input#ft_facepressiiprofile').focus();
@@ -361,58 +369,10 @@ if (!function_exists("test_profile_js")) {
 				_wpnonce: $('input#_wpnonce').val()
 			};
 			
-			var style = "position: absolute; " +
-						"display: none; " +
-						"z-index: 1000; " +
-						"top: 50%; " +
-						"left: 50%; " +
-						"background-color: #E8E8E8; " +
-						"border: 1px solid #555; " +
-						"padding: 15px; " +
-						"width: 350px; " +
-						"min-height: 80px; " +
-						"margin-left: -175px; " + 
-						"margin-top: -40px;" +
-						"text-align: center;" +
-						"vertical-align: middle;";
-			$('body').append("<div id='test_results' style='" + style + "'></div>");
-			$('#test_results').html("<p>Sending test status to Facebook</p>" +
-									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
-			$('#test_results').show();
-			
-			// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
-			jQuery.post(ajaxurl, data, function(response) {
-				$('#test_results').html('<p>' + response + '</p>' +
-										'<input type="button" class="button" name="results_ok_button" id="results_ok_button" value="OK" />');
-				$('#results_ok_button').click(remove_results);
-			});
-			
+			send_facepress(data);
 		});
 		
-		function remove_results() {
-			jQuery("#results_ok_button").unbind("click");
-			jQuery("#test_results").remove();
-			if (typeof document.body.style.maxHeight == "undefined") {//if IE 6
-				jQuery("body","html").css({height: "auto", width: "auto"});
-				jQuery("html").css("overflow","");
-			}
-			document.onkeydown = "";
-			document.onkeyup = "";
-			return false;
-		}
-	});
-	</script>
-	
-	<?php
-	}
-}
-
-if (!function_exists("test_page_js")) {
-	function test_page_js() {
-	?>
-	<script type="text/javascript" >
-	jQuery(document).ready(function($) {
-		$('#test_page').click(function() {
+		$('input#test_page').click(function() {
 			var emailAddr = $('input#ft_facepressiipage').val();
 			if (emailAddr == "") {
 				$('input#ft_facepressiipage').focus();
@@ -425,7 +385,21 @@ if (!function_exists("test_page_js")) {
 				_wpnonce: $('input#_wpnonce').val()
 			};
 			
-			var style = "position: absolute; " +
+			send_facepress(data);
+		});
+		
+		$('input#refacepress_button').click(function() {
+			var data = {
+				action: 	'refacepress',
+				id:  		$('input#post_ID').val(),
+				_wpnonce: 	$('input#refacepress_wpnonce').val()
+			};
+			
+			send_facepress(data);
+		});
+
+       function send_facepress(data) {
+			var style = "position: fixed; " +
 						"display: none; " +
 						"z-index: 1000; " +
 						"top: 50%; " +
@@ -440,7 +414,7 @@ if (!function_exists("test_page_js")) {
 						"text-align: center;" +
 						"vertical-align: middle;";
 			$('body').append("<div id='test_results' style='" + style + "'></div>");
-			$('#test_results').html("<p>Sending test status to Facebook</p>" +
+			$('#test_results').html("<p>Sending update to Facebook</p>" +
 									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
 			$('#test_results').show();
 			
@@ -451,7 +425,7 @@ if (!function_exists("test_page_js")) {
 				$('#results_ok_button').click(remove_results);
 			});
 			
-		});
+		}
 		
 		function remove_results() {
 			jQuery("#results_ok_button").unbind("click");
@@ -477,8 +451,23 @@ if (!function_exists("test_facebook_ajax")) {
 		check_ajax_referer('test_facebook');
 		
 		$emailAddr = $_POST['email'];
-		$status = 'Testing FacePress II WordPress Plugin ( http://fullthrottledevelopment.com/facepress-ii ) at ' . get_bloginfo('url');
+		$status = 'Testing FacePress II WordPress Plugin ( http://knoxwebdev.com/facepress-ii ) at ' . get_bloginfo('url');
 		$result = ft_publish_status($emailAddr, $status);
+		
+		if ($result == 200) {
+			die("Successfully sent your status to Facebook.<br>Don't forget to save your settings.");
+		} else {
+			die($result);
+		}
+	}
+}
+
+if (!function_exists("refacepress_ajax")) {
+	function refacepress_ajax() {
+		check_ajax_referer('refacepress');
+		
+		$id = $_POST['id'];
+		$result = ft_publish_to_facebook($id);
 		
 		if ($result == 200) {
 			die("Successfully sent your status to Facebook.<br>Don't forget to save your settings.");
@@ -704,9 +693,9 @@ if (isset($dl_pluginFTFacePressII)) {
 	add_action('new_to_publish', 'ft_publish_to_facebook');
 	add_action('draft_to_publish', 'ft_publish_to_facebook');
 	
-	add_action('admin_head', 'test_profile_js');
-	add_action('admin_head', 'test_page_js');
+	add_action('admin_head', 'facepress_js');
 	add_action('wp_ajax_test_facebook', 'test_facebook_ajax');
+	add_action('wp_ajax_refacepress', 'refacepress_ajax');
 
 }
 ?>
