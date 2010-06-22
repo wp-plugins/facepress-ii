@@ -21,6 +21,7 @@ This plugin publishes the title, url, and/or excerpt of your post as the status 
 == Changelog ==  
 
 = 2.1.0 =
+* Added functionality to re-publish information to facebook using "Re-FacePress" button in post options
 
 = 2.0.6 =
 * Changed "test facebook connection" process to prepare for future options.
@@ -46,6 +47,7 @@ This plugin publishes the title, url, and/or excerpt of your post as the status 
 == Upgrade Notice ==
 
 = 2.1.0 =
+* Added functionality to re-publish information to facebook using "Re-FacePress" button in post options
 
 = 2.0.6 =
 * Changed "test facebook connection" process to prepare for future options.
